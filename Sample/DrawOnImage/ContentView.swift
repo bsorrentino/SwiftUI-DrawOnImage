@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import DrawOnImage
 import PencilKit
 
 
@@ -65,11 +64,7 @@ struct ContentView: View {
                     .border(.red, width: 4)
                     .aspectRatio(contentMode: (fit) ? .fit : .fill)
             }
-            DrawOnImageView(snapshot: $snapshot,
-                             contentMode: (fit) ? .fit : .fill,
-                             allowToDraw: draw ) {
-                BackgroundImage
-            }
+            BackgroundImage
         }
     }
 }

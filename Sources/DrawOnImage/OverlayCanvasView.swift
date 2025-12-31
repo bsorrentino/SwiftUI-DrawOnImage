@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  OverlayCanvasView.swift
+//
 //
 //  Created by Bartolomeo Sorrentino on 06/02/23.
 //
