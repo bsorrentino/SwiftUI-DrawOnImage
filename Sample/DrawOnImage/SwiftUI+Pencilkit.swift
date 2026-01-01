@@ -71,6 +71,16 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     var backgroundImage: UIImage? {
         didSet {
             backgroundImageView.image = backgroundImage
+            if let img = backgroundImage {
+                let viewportSize = scrollView.frame.size != .zero ? scrollView.frame.size : view.bounds.size
+                let newWidth = max(img.size.width, viewportSize.width)
+                let newHeight = max(img.size.height, viewportSize.height)
+                let newSize = CGSize(width: newWidth, height: newHeight)
+                canvas.frame = CGRect(origin: .zero, size: newSize)
+                backgroundImageView.frame = canvas.frame
+                contentView.frame = canvas.frame
+                scrollView.contentSize = newSize
+            }
             // Update canvas background when an image is set/removed
             self.updateAppearance(for: self.traitCollection.userInterfaceStyle)
             
@@ -147,22 +157,12 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     }
     
     private func updateAppearance(for userInterfaceStyle: UIUserInterfaceStyle) {
-        /// [Using PencilKit in dark mode results in wrong color](https://stackoverflow.com/a/75646551/521197)
-        //let color = PKInkingTool.convertColor(.white, from: .light, to: .dark)
-        //canvas.tool = PKInkingTool(.pen, color: color)
 
-        //print( "==> PICKER SLECTED TOOL \(picker.selectedTool)" )
-        
-        if backgroundImageView.image != nil {
-            // When an image is set, let it show through the canvas
-            canvas.backgroundColor = .clear
-        } else {
-            switch userInterfaceStyle {
-            case .dark:
-                canvas.backgroundColor = .black
-            default:
-                canvas.backgroundColor = .white
-            }
+        switch userInterfaceStyle {
+        case .dark:
+            scrollView.backgroundColor = .black
+        default:
+            scrollView.backgroundColor = .clear
         }
     }
     
@@ -255,7 +255,15 @@ struct DrawingView: UIViewControllerRepresentable {
     
     
     func makeUIViewController(context: Context) -> UIDrawingViewController {
-        let controller =  UIDrawingViewController( initialDrawing: document.drawing, canvasSize: canvasSize )
+        let bgSize = document.drawingBackgroundImage?.size
+        let screenSize = UIScreen.main.bounds.size
+        let targetSize: CGSize
+        if let bgSize = bgSize {
+            targetSize = CGSize(width: max(bgSize.width, screenSize.width), height: max(bgSize.height, screenSize.height))
+        } else {
+            targetSize = canvasSize
+        }
+        let controller = UIDrawingViewController(initialDrawing: document.drawing, canvasSize: targetSize)
         controller.canvas.delegate = context.coordinator
         controller.backgroundImage = document.drawingBackgroundImage
         return controller
@@ -327,7 +335,35 @@ extension UIImage {
 #Preview("with background") {
 
     let document = PlantUMLObservableDocument()
-    document.drawingBackgroundImage = UIImage( named: "diagram1") //?.withBackground(color: .red)
+    document.drawingBackgroundImage = UIImage( named: "diagram1")
+    
+    return DrawingView( document: document,
+                 isUsePickerTool: true,
+                 isScrollEnabled: false,
+                 requestImage: false,
+                 resultImage: .constant(nil))
+                 
+  
+    
+}
+
+#Preview("with background dark mode") {
+    let document = PlantUMLObservableDocument()
+    document.drawingBackgroundImage = UIImage(named: "diagram1")
+    return DrawingView(
+        document: document,
+        isUsePickerTool: true,
+        isScrollEnabled: false,
+        requestImage: false,
+        resultImage: .constant(nil)
+    )
+    .colorScheme(.dark)
+}
+
+#Preview("with large background") {
+
+    let document = PlantUMLObservableDocument()
+    document.drawingBackgroundImage = UIImage( named: "diagram2")
     
     return DrawingView( document: document,
                  isUsePickerTool: true,
