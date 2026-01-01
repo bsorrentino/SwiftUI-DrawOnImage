@@ -30,55 +30,45 @@ struct ToggleButton<Label> : View where Label : View  {
 }
 
 struct ContentView: View {
+    
     var image: UIImage?
-    @State var fit: Bool = true
+    @State var document = PlantUMLObservableDocument()
+    @State var scroll: Bool = false
     @State var draw: Bool = false
     @State private var snapshot: UIImage?
     
-    var BackgroundImage: Image {
-        if let image {
-            return Image( uiImage: image)
-        }
-        else {
-            return Image("")
-        }
-    }
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                ToggleButton( $fit ) {
+        DrawingView( document: document,
+                     isUsePickerTool: draw,
+                     isScrollEnabled: scroll,
+                     requestImage: false,
+                     resultImage: .constant(nil))
+        .onAppear {
+            document.drawingBackgroundImage = image
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                ToggleButton($scroll) {
                     ($0 ?
-                     Label( "", systemImage: "arrow.down.right.and.arrow.up.left" ) :
-                        Label( "", systemImage: "arrow.up.left.and.arrow.down.right") )
+                     Label("", systemImage: "lock") :
+                        Label("", systemImage: "lock.open"))
                     .labelStyle(.iconOnly)
                 }
-                ToggleButton( $draw ) {
+                ToggleButton($draw) {
                     ($0 ?
-                     Label( "", systemImage: "pencil.circle.fill" ) :
-                        Label( "", systemImage: "pencil.circle") )
+                     Label("", systemImage: "pencil.circle.fill") :
+                        Label("", systemImage: "pencil.circle"))
                     .labelStyle(.iconOnly)
                 }
             }
-            if let snapshot {
-                Image( uiImage: snapshot )
-                    .border(.red, width: 4)
-                    .aspectRatio(contentMode: (fit) ? .fit : .fill)
-            }
-            BackgroundImage
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ForEach( ["001a", "diagram1"], id: \.self ) { imgName in
-            Group {
-                ContentView( image: UIImage( named: imgName )  )
-                    .previewInterfaceOrientation(.portrait)
-                ContentView( image: UIImage( named: imgName ) )
-                    .previewInterfaceOrientation(.landscapeLeft)
-            }
-        }
-    }
+#Preview(traits: .portrait) {
+    ContentView( image: UIImage( named: "diagram1" )  )
+}
+#Preview(traits: .landscapeLeft) {
+    ContentView( image: UIImage( named: "diagram1" )  )
 }
 
