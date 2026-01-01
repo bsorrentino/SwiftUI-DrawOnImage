@@ -32,21 +32,47 @@ struct ToggleButton<Label> : View where Label : View  {
 struct ContentView: View {
     
     var image: UIImage?
+    @Environment( \.colorScheme) var colorScheme
     @State var document = PlantUMLObservableDocument()
     @State var scroll: Bool = false
     @State var draw: Bool = false
     @State private var snapshot: UIImage?
-    
+    @State private var resultImage: UIImage? = nil
+    @State private var requestImage = false
+
     var body: some View {
         DrawingView( document: document,
                      isUsePickerTool: draw,
                      isScrollEnabled: scroll,
-                     requestImage: false,
-                     resultImage: .constant(nil))
+                     requestImage: requestImage,
+                     resultImage: $resultImage)
+        .onChange(of: requestImage, initial: false) { oldValue, newValue in
+            if newValue {
+                processImage()
+            }
+        }
         .onAppear {
             document.drawingBackgroundImage = image
         }
         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button( action: {
+                    //processImage()
+                    requestImage = true
+                }, label: {
+                    Label( "share", systemImage: "")
+                        .labelStyle(.titleOnly)
+                })
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    
+                } label: {
+                    Label("Import", systemImage: "photo.badge.plus")
+                        .foregroundColor(Color.orange)
+                }
+            }
+            
             ToolbarItemGroup(placement: .bottomBar) {
                 ToggleButton($scroll) {
                     ($0 ?
@@ -63,12 +89,53 @@ struct ContentView: View {
             }
         }
     }
+    
+    func processImage() {
+        guard let resultImage else {
+            return
+        }
+        
+        // getting image from Canvas
+        
+        let backgroundColor:UIColor = (colorScheme == .dark ) ? .black : .white
+        let image = resultImage.withBackground(color: backgroundColor)
+        
+        if let imageData = image.pngData() {
+            
+            saveData(imageData,
+                     toFile: "image.png",
+                     inDirectory: .picturesDirectory)
+        }
+    }
+    
+    fileprivate func saveData( _ data: Data,
+                               toFile fileName: String,
+                               inDirectory directory: FileManager.SearchPathDirectory ) {
+        do {
+            let dir = try FileManager.default.url(for: directory,
+                                                  in: .userDomainMask,
+                                                  appropriateFor: nil,
+                                                  create: true)
+            let fileURL = dir.appendingPathComponent(fileName)
+            print( "fileURL\n\(fileURL)")
+            try data.write(to: fileURL)
+        }
+        catch {
+            print( "error saving file \(error.localizedDescription)" )
+        }
+    }
+
+  
 }
 
 #Preview(traits: .portrait) {
-    ContentView( image: UIImage( named: "diagram1" )  )
+    NavigationStack {
+        ContentView( image: UIImage( named: "diagram1" )  )
+    }
 }
 #Preview(traits: .landscapeLeft) {
-    ContentView( image: UIImage( named: "diagram1" )  )
+    NavigationStack {
+        ContentView( image: UIImage( named: "diagram1" )  )
+    }
 }
 

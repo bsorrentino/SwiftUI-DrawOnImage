@@ -12,17 +12,27 @@ struct DrawOnImageApp: App {
     var body: some Scene {
         WindowGroup {
             TabView {
-                ContentView( image: UIImage(named: "001a"))
-                    .tabItem {
-                        Label("001a", systemImage: "")
-                    }
-                
-                ContentView( image: UIImage(named: "diagram1"))
-                    .tabItem {
-                        Label("diagram1", systemImage: "")
-                    }
+                NavigationStack {
+                    ContentView()
+                }
+                .tabItem {
+                    Label("none", systemImage: "")
+                }
+                NavigationStack {
+                    ContentView( image: UIImage(named: "diagram1"))
+                }
+                .tabItem {
+                    Label("diagram1", systemImage: "")
+                }
+                NavigationStack {
+                    ContentView( image: UIImage(named: "diagram2"))
+                }
+                .tabItem {
+                    Label("diagram2", systemImage: "")
+                }
             }
         }
-        
     }
+        
 }
+
