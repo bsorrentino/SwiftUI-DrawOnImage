@@ -7,7 +7,7 @@
 import SwiftUI
 import PencilKit
 
-class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
+public class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     
     var canvas: PKCanvasView
     let scrollView = UIScrollView()
@@ -87,7 +87,7 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     }
     var picker = PKToolPicker()
         
-    init( initialDrawing drawing: PKDrawing, canvasSize: CGSize ) {
+    init( initialDrawing drawing: PKDrawing, canvasSize: CGSize, DEMO_MODE:Bool = false ) {
         self.canvas = PKCanvasView(frame: CGRect( origin: CGPoint(x: 0, y: 0), size: canvasSize))
         // contentView has same size as the canvas and will host backgroundImageView + canvas
         self.contentView.frame = self.canvas.frame
@@ -107,7 +107,7 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         if #available(iOS 17.0, *) {
@@ -144,7 +144,6 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
         backgroundImageView.frame = canvas.bounds
         backgroundImageView.contentMode = .scaleAspectFit
         //backgroundImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        //backgroundImageView.contentMode = .scaleAspectFit
         backgroundImageView.image = backgroundImage
 
         // contentView hosts both the background image and the canvas
@@ -168,25 +167,25 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     }
     
     // UIScrollViewDelegate method to enable zooming
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return contentView
     }
     
-    override func viewDidLayoutSubviews() {
+    public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         scrollView.frame = view.bounds
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         canvas.becomeFirstResponder()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
+    public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         picker.setVisible(false, forFirstResponder: canvas)
         self.update(isUsePickerTool: false)
@@ -221,7 +220,7 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
 @available(iOS 16.0, *)
 extension UIDrawingViewController {
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         if #available(iOS 17.0, *) {
              // Don't call super; it's deprecated
          } else {
@@ -263,21 +262,35 @@ extension UIDrawingViewController {
 }
 
 @available(iOS 16.0, *)
-struct DrawingView: UIViewControllerRepresentable {
-    var document: PlantUMLObservableDocument
-    var canvasSize: CGSize = CGSize( width: 2000,height: 2000 )
+public struct DrawingView: UIViewControllerRepresentable {
+    @ObservedObject var document: DrawableObservableDocument
+    var canvasSize: CGSize
     var isUsePickerTool: Bool
     var isScrollEnabled: Bool
     var requestImage: Bool
     @Binding var resultImage: UIImage?
     
+    public init(document: DrawableObservableDocument,
+                canvasSize: CGSize = CGSize( width: 2000,height: 2000 ),
+                isUsePickerTool: Bool,
+                isScrollEnabled: Bool,
+                requestImage: Bool,
+                resultImage: Binding<UIImage?>) {
+        self.document = document
+        self.canvasSize = canvasSize
+        self.isUsePickerTool = isUsePickerTool
+        self.isScrollEnabled = isScrollEnabled
+        self.requestImage = requestImage
+        self._resultImage = resultImage
+    }
     
-    func makeUIViewController(context: Context) -> UIDrawingViewController {
+    public func makeUIViewController(context: Context) -> UIDrawingViewController {
         let bgSize = document.drawingBackgroundImage?.size
         let screenSize = UIScreen.main.bounds.size
         let targetSize: CGSize
         if let bgSize = bgSize {
-            targetSize = CGSize(width: max(bgSize.width, screenSize.width), height: max(bgSize.height, screenSize.height))
+            targetSize = CGSize(width: max(bgSize.width, screenSize.width),
+                                height: max(bgSize.height, screenSize.height))
         } else {
             targetSize = canvasSize
         }
@@ -287,7 +300,7 @@ struct DrawingView: UIViewControllerRepresentable {
         return controller
     }
     
-    func updateUIViewController(_ uiViewController: UIDrawingViewController, context: Context) {
+    public func updateUIViewController(_ uiViewController: UIDrawingViewController, context: Context) {
         // updating the tool whenever the view updates
         uiViewController.update(isUsePickerTool: isUsePickerTool)
         uiViewController.isScrollEnabled = isScrollEnabled
@@ -298,11 +311,11 @@ struct DrawingView: UIViewControllerRepresentable {
 
     }
     
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         Coordinator( owner: self )
     }
     
-    class Coordinator: NSObject, PKCanvasViewDelegate {
+    public class Coordinator: NSObject, PKCanvasViewDelegate {
         
         var owner: DrawingView
         
@@ -311,7 +324,7 @@ struct DrawingView: UIViewControllerRepresentable {
         }
         // Implement the delegate methods here
         // PKCanvasViewDelegate
-        func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+        public func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
             owner.document.drawing = canvasView.drawing
             
         }
@@ -322,9 +335,9 @@ struct DrawingView: UIViewControllerRepresentable {
 /// [how to set a background color in UIimage in swift programming](https://stackoverflow.com/a/53500161/521197)
 ///
 extension UIImage {
-    func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+    public func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
         guard let ctx = UIGraphicsGetCurrentContext(), let image = cgImage else { return self }
+        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
         defer { UIGraphicsEndImageContext() }
         let rect = CGRect(origin: .zero, size: size)
         ctx.setFillColor(color.cgColor)
@@ -342,10 +355,7 @@ struct DrawingView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             DrawingView(
-                document: {
-                    let document = PlantUMLObservableDocument()
-                    return document
-                }(),
+                document: DrawableObservableDocument(),
                 isUsePickerTool: true,
                 isScrollEnabled: false,
                 requestImage: false,
@@ -355,7 +365,7 @@ struct DrawingView_Previews: PreviewProvider {
             
             DrawingView(
                 document: {
-                    let document = PlantUMLObservableDocument()
+                    let document = DrawableObservableDocument()
                     document.drawingBackgroundImage = UIImage(named: "diagram1")
                     return document
                 }(),
@@ -368,7 +378,7 @@ struct DrawingView_Previews: PreviewProvider {
             
             DrawingView(
                 document: {
-                    let document = PlantUMLObservableDocument()
+                    let document = DrawableObservableDocument()
                     document.drawingBackgroundImage = UIImage(named: "diagram1")
                     return document
                 }(),
@@ -382,7 +392,7 @@ struct DrawingView_Previews: PreviewProvider {
             
             DrawingView(
                 document: {
-                    let document = PlantUMLObservableDocument()
+                    let document = DrawableObservableDocument()
                     document.drawingBackgroundImage = UIImage(named: "diagram2")
                     return document
                 }(),
