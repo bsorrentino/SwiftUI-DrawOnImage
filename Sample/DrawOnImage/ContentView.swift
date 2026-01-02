@@ -46,7 +46,7 @@ struct ContentView: View {
                      isScrollEnabled: scroll,
                      requestImage: requestImage,
                      resultImage: $resultImage)
-        .onChange(of: requestImage, initial: false) { oldValue, newValue in
+        .onChange( of: requestImage ) { newValue in
             if newValue {
                 processImage()
             }
@@ -128,14 +128,10 @@ struct ContentView: View {
   
 }
 
-#Preview(traits: .portrait) {
+#Preview {
     NavigationStack {
         ContentView( image: UIImage( named: "diagram1" )  )
     }
 }
-#Preview(traits: .landscapeLeft) {
-    NavigationStack {
-        ContentView( image: UIImage( named: "diagram1" )  )
-    }
-}
+
 
