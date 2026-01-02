@@ -49,6 +49,7 @@ struct ContentView: View {
         .onChange(of: requestImage, initial: false) { oldValue, newValue in
             if newValue {
                 processImage()
+                requestImage = false
             }
         }
         .onAppear {
@@ -104,7 +105,9 @@ struct ContentView: View {
             
             saveData(imageData,
                      toFile: "image.png",
-                     inDirectory: .picturesDirectory)
+                     inDirectory: .documentDirectory)
+            
+            
         }
     }
     
