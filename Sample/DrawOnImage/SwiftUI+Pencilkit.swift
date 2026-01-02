@@ -7,7 +7,6 @@
 import SwiftUI
 import PencilKit
 
-
 class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     
     var canvas: PKCanvasView
@@ -111,9 +110,11 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // iOS 17+: observe trait changes via UITraitChangeObservable registration APIs
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, previousTraitCollection: UITraitCollection) in
-            self.updateAppearance(for: self.traitCollection.userInterfaceStyle)
+        if #available(iOS 17.0, *) {
+            // iOS 17+: observe trait changes via UITraitChangeObservable registration APIs
+            registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, previousTraitCollection: UITraitCollection) in
+                self.updateAppearance(for: self.traitCollection.userInterfaceStyle)
+            }
         }
         
         setupScrollView()
@@ -217,9 +218,25 @@ class UIDrawingViewController : UIViewController, UIScrollViewDelegate {
     
 }
 
+@available(iOS 16.0, *)
+extension UIDrawingViewController {
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        if #available(iOS 17.0, *) {
+             // Don't call super; it's deprecated
+         } else {
+             super.traitCollectionDidChange(previousTraitCollection)
+             if let previous = previousTraitCollection,
+                previous.userInterfaceStyle != traitCollection.userInterfaceStyle {
+                 updateAppearance(for: traitCollection.userInterfaceStyle)
+             }
+         }
+    }
+}
 
 // MARK: DEMO
 
+@available(iOS 16.0, *)
 extension UIDrawingViewController {
     
     fileprivate func slowDrawingForDemo( drawing: PKDrawing, timeInterval: TimeInterval  ) {
@@ -245,6 +262,7 @@ extension UIDrawingViewController {
 
 }
 
+@available(iOS 16.0, *)
 struct DrawingView: UIViewControllerRepresentable {
     var document: PlantUMLObservableDocument
     var canvasSize: CGSize = CGSize( width: 2000,height: 2000 )
@@ -317,60 +335,64 @@ extension UIImage {
     }
 }
 
+import UIKit
 
-#Preview("without background") {
-
-    let document = PlantUMLObservableDocument()
-
-    DrawingView( document: document,
-                 isUsePickerTool: true,
-                 isScrollEnabled: false,
-                 requestImage: false,
-                 resultImage: .constant(nil))
-                 
-  
-    
+@available(iOS 16.0, *)
+struct DrawingView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            DrawingView(
+                document: {
+                    let document = PlantUMLObservableDocument()
+                    return document
+                }(),
+                isUsePickerTool: true,
+                isScrollEnabled: false,
+                requestImage: false,
+                resultImage: .constant(nil)
+            )
+            .previewDisplayName("without background")
+            
+            DrawingView(
+                document: {
+                    let document = PlantUMLObservableDocument()
+                    document.drawingBackgroundImage = UIImage(named: "diagram1")
+                    return document
+                }(),
+                isUsePickerTool: true,
+                isScrollEnabled: false,
+                requestImage: false,
+                resultImage: .constant(nil)
+            )
+            .previewDisplayName("with background")
+            
+            DrawingView(
+                document: {
+                    let document = PlantUMLObservableDocument()
+                    document.drawingBackgroundImage = UIImage(named: "diagram1")
+                    return document
+                }(),
+                isUsePickerTool: true,
+                isScrollEnabled: false,
+                requestImage: false,
+                resultImage: .constant(nil)
+            )
+            .colorScheme(.dark)
+            .previewDisplayName("with background dark mode")
+            
+            DrawingView(
+                document: {
+                    let document = PlantUMLObservableDocument()
+                    document.drawingBackgroundImage = UIImage(named: "diagram2")
+                    return document
+                }(),
+                isUsePickerTool: true,
+                isScrollEnabled: false,
+                requestImage: false,
+                resultImage: .constant(nil)
+            )
+            .previewDisplayName("with large background")
+        }
+    }
 }
 
-#Preview("with background") {
-
-    let document = PlantUMLObservableDocument()
-    document.drawingBackgroundImage = UIImage( named: "diagram1")
-    
-    return DrawingView( document: document,
-                 isUsePickerTool: true,
-                 isScrollEnabled: false,
-                 requestImage: false,
-                 resultImage: .constant(nil))
-                 
-  
-    
-}
-
-#Preview("with background dark mode") {
-    let document = PlantUMLObservableDocument()
-    document.drawingBackgroundImage = UIImage(named: "diagram1")
-    return DrawingView(
-        document: document,
-        isUsePickerTool: true,
-        isScrollEnabled: false,
-        requestImage: false,
-        resultImage: .constant(nil)
-    )
-    .colorScheme(.dark)
-}
-
-#Preview("with large background") {
-
-    let document = PlantUMLObservableDocument()
-    document.drawingBackgroundImage = UIImage( named: "diagram2")
-    
-    return DrawingView( document: document,
-                 isUsePickerTool: true,
-                 isScrollEnabled: false,
-                 requestImage: false,
-                 resultImage: .constant(nil))
-                 
-  
-    
-}
