@@ -7,7 +7,7 @@
 
 import SwiftUI
 import PencilKit
-
+import DrawOnImage
 
 struct ToggleButton<Label> : View where Label : View  {
      
@@ -33,7 +33,7 @@ struct ContentView: View {
     
     var image: UIImage?
     @Environment( \.colorScheme) var colorScheme
-    @State var document = PlantUMLObservableDocument()
+    @State var document = DrawableObservableDocument()
     @State var scroll: Bool = false
     @State var draw: Bool = false
     @State private var snapshot: UIImage?
