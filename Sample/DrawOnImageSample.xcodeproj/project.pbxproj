@@ -15,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A01B19BC2F081623008B1EB1 /* DrawOnImageSample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "DrawOnImageSample-Info.plist"; sourceTree = "<group>"; };
 		A03ADAB3299101E20020267C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A08AEBE2298D553A00DEC08A /* DrawOnImageSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DrawOnImageSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A08AEBE5298D553A00DEC08A /* DrawOnImageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawOnImageApp.swift; sourceTree = "<group>"; };
@@ -38,6 +39,7 @@
 		A08AEBD9298D553A00DEC08A = {
 			isa = PBXGroup;
 			children = (
+				A01B19BC2F081623008B1EB1 /* DrawOnImageSample-Info.plist */,
 				A0E822C0298D7352006FF471 /* Packages */,
 				A08AEBE4298D553A00DEC08A /* DrawOnImage */,
 				A08AEBE3298D553A00DEC08A /* Products */,
@@ -293,6 +295,8 @@
 				DEVELOPMENT_TEAM = 48J595L9BX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DrawOnImageSample-Info.plist";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -326,6 +330,8 @@
 				DEVELOPMENT_TEAM = 48J595L9BX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "DrawOnImageSample-Info.plist";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

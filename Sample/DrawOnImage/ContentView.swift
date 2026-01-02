@@ -49,6 +49,7 @@ struct ContentView: View {
         .onChange( of: requestImage ) { newValue in
             if newValue {
                 processImage()
+                requestImage = false
             }
         }
         .onAppear {
