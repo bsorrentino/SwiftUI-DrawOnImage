@@ -264,7 +264,11 @@ extension UIDrawingViewController {
 
 @available(iOS 16.0, *)
 public struct DrawingView: UIViewControllerRepresentable {
+    #if __USE_OBSERVABLE__
     var document: DrawableObservableDocument
+    #else
+    @ObservedObject var document: DrawableObservableDocument
+    #endif
     var canvasSize: CGSize
     var isUsePickerTool: Bool
     var isScrollEnabled: Bool
