@@ -33,7 +33,11 @@ struct ContentView: View {
     
     var image: UIImage?
     @Environment( \.colorScheme) var colorScheme
+    #if __USE_OBSERVABLE__
     @State var document = DrawableObservableDocument()
+    #else
+    @StateObject var document = DrawableObservableDocument()
+    #endif
     @State var scroll: Bool = false
     @State var draw: Bool = false
     @State private var snapshot: UIImage?
