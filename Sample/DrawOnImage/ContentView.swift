@@ -103,7 +103,7 @@ struct ContentView: View {
         // getting image from Canvas
         
         let backgroundColor:UIColor = (colorScheme == .dark ) ? .black : .white
-        let image = resultImage.withBackground(color: backgroundColor)
+        let image = resultImage.withBackgroundColor(backgroundColor)
         
         if let imageData = image.pngData() {
             
