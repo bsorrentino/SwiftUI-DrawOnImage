@@ -33,7 +33,7 @@ struct ContentView: View {
     
     var image: UIImage?
     @Environment( \.colorScheme) var colorScheme
-    #if __USE_OBSERVABLE__
+    #if USE_OBSERVABLE
     @State var document = DrawableObservableDocument()
     #else
     @StateObject var document = DrawableObservableDocument()

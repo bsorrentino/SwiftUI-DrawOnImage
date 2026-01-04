@@ -1,10 +1,10 @@
 
 import SwiftUI
-import Observation
 import PencilKit
 
+#if USE_OBSERVABLE
+import Observation
 
-#if __USE_OBSERVABLE__
 @Observable
 open class DrawableObservableDocument {
     public var drawing: PKDrawing
