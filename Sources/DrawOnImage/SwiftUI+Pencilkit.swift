@@ -269,6 +269,7 @@ public struct DrawingView: UIViewControllerRepresentable {
     var isScrollEnabled: Bool
     var requestImage: Bool
     @Binding var resultImage: UIImage?
+    var demo_mode:Bool = false
     
     public init(document: DrawableObservableDocument,
                 canvasSize: CGSize = CGSize( width: 2000,height: 2000 ),
@@ -294,7 +295,9 @@ public struct DrawingView: UIViewControllerRepresentable {
         } else {
             targetSize = canvasSize
         }
-        let controller = UIDrawingViewController(initialDrawing: document.drawing, canvasSize: targetSize)
+        let controller = UIDrawingViewController(initialDrawing: document.drawing,
+                                                 canvasSize: targetSize,
+                                                 DEMO_MODE: demo_mode)
         controller.canvas.delegate = context.coordinator
         controller.backgroundImage = document.drawingBackgroundImage
         return controller
