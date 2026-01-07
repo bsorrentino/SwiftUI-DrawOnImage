@@ -274,19 +274,22 @@ public struct DrawingView: UIViewControllerRepresentable {
     var isScrollEnabled: Bool
     var requestImage: Bool
     @Binding var resultImage: UIImage?
+    var demo_mode: Bool
     
     public init(document: DrawableObservableDocument,
                 canvasSize: CGSize = CGSize( width: 2000,height: 2000 ),
                 isUsePickerTool: Bool,
                 isScrollEnabled: Bool,
                 requestImage: Bool,
-                resultImage: Binding<UIImage?> = .constant(nil)) {
-        self.document = document
-        self.canvasSize = canvasSize
-        self.isUsePickerTool = isUsePickerTool
-        self.isScrollEnabled = isScrollEnabled
-        self.requestImage = requestImage
-        self._resultImage = resultImage
+                resultImage: Binding<UIImage?> = .constant(nil),
+                demo_mode: Bool = false ) {
+        self.document           = document
+        self.canvasSize         = canvasSize
+        self.isUsePickerTool    = isUsePickerTool
+        self.isScrollEnabled    = isScrollEnabled
+        self.requestImage       = requestImage
+        self._resultImage       = resultImage
+        self.demo_mode          = demo_mode
     }
     
     public func makeUIViewController(context: Context) -> UIDrawingViewController {
@@ -312,7 +315,6 @@ public struct DrawingView: UIViewControllerRepresentable {
         if requestImage {
             resultImage = uiViewController.resultImage
         }
-
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -323,9 +325,10 @@ public struct DrawingView: UIViewControllerRepresentable {
         
         var owner: DrawingView
         
-        init(owner: DrawingView) {
+        init( owner: DrawingView ) {
             self.owner = owner
         }
+        
         // Implement the delegate methods here
         // PKCanvasViewDelegate
         public func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
@@ -334,8 +337,6 @@ public struct DrawingView: UIViewControllerRepresentable {
         }
     }
 }
-
-
 
 #Preview {
 
